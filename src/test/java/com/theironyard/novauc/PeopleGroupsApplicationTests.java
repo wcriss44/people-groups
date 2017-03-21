@@ -109,5 +109,4 @@ public class PeopleGroupsApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
-
 }
