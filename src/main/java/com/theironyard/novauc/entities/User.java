@@ -1,5 +1,7 @@
 package com.theironyard.novauc.entities;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 
 /**
@@ -12,21 +14,27 @@ public class User {
 
     @Id
     @GeneratedValue
+    @ApiModelProperty(notes = "the unique but not very random SSN")
     int id;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "what is in a name?")
     String name;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "Where the sidewalk ends")
     String address;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "Depending on the connection, this can feel like snail-mail")
     String email;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "More like shell-phone!")
     String cellphone;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "Service should be mandatory!")
     String servicebranch;
 
     public  User(){
