@@ -1,5 +1,6 @@
 package com.theironyard.novauc.controllers;
 
+import com.theironyard.novauc.entities.PbUser;
 import com.theironyard.novauc.entities.User;
 import com.theironyard.novauc.services.UserRepository;
 import io.swagger.annotations.Api;
@@ -7,15 +8,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-
-/**
- * Created by octavio on 3/17/17.
- */
+import java.util.Map;
 
 @RestController
 @Api(value="SSA API", description="AAF - Acronyms Are Fun")
@@ -84,6 +90,34 @@ public class PeopleGroupsController {
     public User getUser(@PathVariable("id") int id) {
         return users.findOne(id);
     }
+    @RequestMapping(path ="/pbuser/{id}", method = RequestMethod.GET)
+        public PbUser getPbUser(@PathVariable("id") int id){
+            RestTemplate restTemplate = new RestTemplate();
+            PbUser[] pbUserArr = restTemplate.getForObject("https://immense-lowlands-84747.herokuapp.com/user", PbUser[].class);
+            PbUser pbUser = null;
+            for (PbUser p: pbUserArr){
+                if (p.getId() == id){
+                    pbUser = p;
+                }
+            }
+            if (pbUser != null){       MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+                Map map = new HashMap();
+                map.put("Content-Type", "application/json");
+
+                headers.setAll(map);
+
+                Map<String, String> req_payload = new HashMap<>();
+                req_payload.put("email", pbUser.getEmailAddress());
+                req_payload.put("address", pbUser.getAffiliation());
+                req_payload.put("name", pbUser.getName());
+                req_payload.put("phonenumber", pbUser.getPhone());
+                req_payload.put("ssn", pbUser.getFlavor());
+
+                HttpEntity<?> request = new HttpEntity<>(req_payload, headers);
+                String url = "https://secure-retreat-36287.herokuapp.com/user";
+            }
+            return pbUser;
+        }
     @PostConstruct
     public void init() {
 

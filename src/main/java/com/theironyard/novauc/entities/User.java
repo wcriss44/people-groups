@@ -4,9 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 
-/**
- * Created by octavio on 3/17/17.
- */
 @Entity
 @Table(name = "users")
 
