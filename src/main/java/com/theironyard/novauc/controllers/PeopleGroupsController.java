@@ -92,6 +92,7 @@ public class PeopleGroupsController {
     }
     @RequestMapping(path ="/pbuser/{id}", method = RequestMethod.GET)
         public PbUser getPbUser(@PathVariable("id") int id){
+            //This part of the method conducts a get request on Peter's application
             RestTemplate restTemplate = new RestTemplate();
             PbUser[] pbUserArr = restTemplate.getForObject("https://immense-lowlands-84747.herokuapp.com/user", PbUser[].class);
             PbUser pbUser = null;
@@ -100,6 +101,7 @@ public class PeopleGroupsController {
                     pbUser = p;
                 }
             }
+            //This part of the method checks to see if a successful get request was done. If so, it does a post request to D'Angelo
             if (pbUser != null){       MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
                 Map map = new HashMap();
                 map.put("Content-Type", "application/json");
@@ -116,6 +118,7 @@ public class PeopleGroupsController {
                 HttpEntity<?> request = new HttpEntity<>(req_payload, headers);
                 String url = "https://secure-retreat-36287.herokuapp.com/user";
             }
+            //This will be null if no user was found by the get method, or it will return the object
             return pbUser;
         }
     @PostConstruct
