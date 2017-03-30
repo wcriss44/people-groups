@@ -7,11 +7,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jdk.nashorn.internal.ir.RuntimeNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -92,7 +90,7 @@ public class PeopleGroupsController {
     }
     @RequestMapping(path ="/pbuser/{id}", method = RequestMethod.GET)
         public PbUser getPbUser(@PathVariable("id") int id){
-            //This part of the method conducts a get request on Peter's application
+            // This part of the method does a GET request on Peter's API, and then builds an object out of it
             RestTemplate restTemplate = new RestTemplate();
             PbUser[] pbUserArr = restTemplate.getForObject("https://immense-lowlands-84747.herokuapp.com/user", PbUser[].class);
             PbUser pbUser = null;
@@ -101,13 +99,21 @@ public class PeopleGroupsController {
                     pbUser = p;
                 }
             }
-            //This part of the method checks to see if a successful get request was done. If so, it does a post request to D'Angelo
-            if (pbUser != null){       MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+            //This will return a null object if the request failed or an object if it was successful
+            return pbUser;
+        }
+        @RequestMapping(path="/djuser/{id}", method=RequestMethod.POST)
+        public void djaddUser(@PathVariable("id") int id){
+            PbUser pbUser = getPbUser(id);
+
+            if (pbUser != null) {
+                MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+                // This part of the method verifies that an object was created, and if it was that object is added to D'Angelo's
                 Map map = new HashMap();
                 map.put("Content-Type", "application/json");
 
                 headers.setAll(map);
-
+                //This will add the body of the http request, setting all of the variables that are needed
                 Map<String, String> req_payload = new HashMap<>();
                 req_payload.put("email", pbUser.getEmailAddress());
                 req_payload.put("address", pbUser.getAffiliation());
@@ -115,12 +121,23 @@ public class PeopleGroupsController {
                 req_payload.put("phonenumber", pbUser.getPhone());
                 req_payload.put("ssn", pbUser.getFlavor());
 
+                //This is the actual request, filled with the body and header from above
                 HttpEntity<?> request = new HttpEntity<>(req_payload, headers);
                 String url = "https://secure-retreat-36287.herokuapp.com/user";
+
+                //This uses the URL and Request from above to generate a post request.
+                ResponseEntity<?> response = new RestTemplate().postForEntity(url, request, String.class);
             }
-            //This will be null if no user was found by the get method, or it will return the object
-            return pbUser;
         }
+    @RequestMapping(path="/pbuser/{id}", method=RequestMethod.DELETE)
+    public void deletePbUser(@PathVariable("id") int id){
+            RestTemplate restTemplate = new RestTemplate();
+            MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+            // This part of the method verifies that an object was created, and if it was that object is added to D'Angelo's
+            Map map = new HashMap();
+            map.put("Content-Type", "application/json");
+            restTemplate.exchange("https://immense-lowlands-84747.herokuapp.com/user/" + id, HttpMethod.DELETE, new HttpEntity<String>(headers), String.class);
+    }
     @PostConstruct
     public void init() {
 
